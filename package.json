@@ -1,6 +1,6 @@
 {
   "name": "react-native-mzcore",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "core file",
   "main": "index.js",
   "scripts": {
