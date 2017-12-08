@@ -21,6 +21,7 @@ export default class extends React.Component {
 
     render(){
         let props = this.props;
+        let tabCg = props.tabBarConfig || {};
         let tabBarCfg = {
             animationEnabled: false, // 切换页面时不显示动画
             tabBarPosition: 'bottom', // 显示在底端，android 默认是显示在页面顶端的
@@ -29,15 +30,15 @@ export default class extends React.Component {
             lazy: true,
             tabBarOptions: {
                 upperCaseLabel: false,
-                activeTintColor: '#0372d9', // 文字和图片选中颜色
-                inactiveTintColor: '#878787', // 文字和图片默认颜色
+                activeTintColor: tabCg.activeTintColor ?  tabCg.activeTintColor : '#0372d9', // 文字和图片选中颜色
+                inactiveTintColor: tabCg.inactiveTintColor ? tabCg.inactiveTintColor : '#878787', // 文字和图片默认颜色
                 showIcon: true, // android 默认不显示 icon, 需要设置为 true 才会显示
                 indicatorStyle: {height: 0}, // android 中TabBar下面会显示一条线，高度设为 0 后就不显示线了， 不知道还有没有其它方法隐藏？？？
-                style: {
+                style: tabCg.tabStyle ? tabCg.tabStyle : {
                     backgroundColor: '#fff', // TabBar 背景色
                     height: 50,
                 },
-                labelStyle: {
+                labelStyle: tabCg.labelStyle ? tabCg.labelStyle :{
                     fontSize: 10, // 文字大小
                     marginTop: 0
                 },

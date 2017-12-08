@@ -45,7 +45,7 @@ const applyRouteNavigation = (props) => {
     }
 }
 
-const createAppNavigator = () => {
+const createAppNavigator = (mainProps) => {
 
     // 注册主界面控制器
     StackNavigatorConfig[DEFAULT_INITIALROUTENAME] = {
@@ -54,6 +54,7 @@ const createAppNavigator = () => {
             return <TabMain
                 {...props}
                 tabMenus={TabNavigatorMenus}
+                {...mainProps}
             />
         },
     };
@@ -125,7 +126,7 @@ class ProjectCore extends React.Component {
         // 去除警告
         console.disableYellowBox = props.disableYellowBox || false;
         // 生成导航器
-        AppNavigator = createAppNavigator();
+        AppNavigator = createAppNavigator(props);
         AppWithNavigationState = connect(state => {
             return (
                 {
