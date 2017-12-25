@@ -5,7 +5,9 @@ import React from 'react';
 import {
     View,
     Text,
-    Alert
+    Alert,
+    Animated,
+    Easing
 } from 'react-native';
 import {
     Provider,
@@ -34,11 +36,14 @@ const applyRouteNavigation = (props) => {
         let navigate, naviName;
         naviName = "navigation";
         navigate = props.navigation.navigate;
-        props[naviName].navigate = (...args) => {
+        props[naviName].navigate = (routeName,params,animateConfig) => {
             let appNaviKey =  props.navigation.state.routeName;
             let isCardAnimated = kit.getValueSystem(appNaviKey);
             if (!isCardAnimated) {
-                navigate(...args);
+                if (animateConfig) {
+                    kit.setValueSystem("initalScreenInterpolator",animateConfig);
+                }
+                navigate(routeName,params);
                 kit.setValueSystem(appNaviKey, true);
             }
         }
@@ -78,17 +83,46 @@ const createAppNavigator = (mainProps) => {
     return StackNavigator(StackNavigatorConfig, {
         headerMode: "none",
         initialRouteName: kit.getValueSystem("initialRouteName", true) || DEFAULT_INITIALROUTENAME,
-        transitionConfig: () => ({
-            screenInterpolator: CardStackStyleInterpolator.forHorizontal,
-        }),
-        onTransitionStart: (item, pre) => {
+        transitionConfig: () => {
+            // 改变个性化动画
+            // 默认水平横进来
+            let  initalScreenInterpolator= kit.getValueSystem("initalScreenInterpolator");
+            let screenInterConfig = initalScreenInterpolator || {
+                animateStyle:"horizontal",
+                // animateStyle:"horizontal",
+                isAnimated:true
+            };
+            let cardStyle = CardStackStyleInterpolator.forHorizontal;
+            if(screenInterConfig.animateStyle == "vertical") {
+                cardStyle = CardStackStyleInterpolator.forVertical;
+            } else {
+                cardStyle = CardStackStyleInterpolator.forHorizontal;
+            }
 
+            let transitionSpec = {
+                    duration: 250,
+                    easing: Easing.linear,
+                    timing: Animated.timing,
+            };
+            if (!screenInterConfig.isAnimated){
+                transitionSpec.duration = 0;
+            }
+            return {
+                screenInterpolator:cardStyle,
+                transitionSpec: transitionSpec,
+            }
+        },
+        onTransitionStart: (item, pre) => {
+            // kit.getValueSystem("initalScreenInterpolator",CardStackStyleInterpolator.forVertical);
             let idx = item.navigation.state.index;
             let route = item.navigation.state.routes[idx];
             kit.setValueSystem(route.routeName, null);
         },
         onTransitionEnd: (item, pre) => {
-
+            let initalScreenInterpolator = kit.getValueSystem("initalScreenInterpolator");
+            if (initalScreenInterpolator) {
+                kit.setValueSystem("initalScreenInterpolator",null);
+            }
             let idx = item.navigation.state.index;
             let route = item.navigation.state.routes[idx];
 
