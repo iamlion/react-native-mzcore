@@ -29,7 +29,7 @@ const kit = require("./hooks/kit");
 const VIEW_SUFFIX = "MZ", DEFAULT_INITIALROUTENAME = `${VIEW_SUFFIX}_mainscreen`;
 const StackNavigatorConfig = {};
 let StackNavigatorMenus = [], TabNavigatorMenus = [];
-
+let mainDidEvent = [];
 
 const applyRouteNavigation = (props) => {
     if (props.navigation) {
@@ -46,6 +46,19 @@ const applyRouteNavigation = (props) => {
                 navigate(routeName, params);
                 kit.setValueSystem(appNaviKey, true);
             }
+        }
+        props.registerDidLoadEvent = (d)=>{
+            mainDidEvent.push(d);
+        }
+        props.unregisterDidLoadEvent = (d)=>{
+            let newpush = [];
+            for(let i of mainDidEvent){
+                if (i == d){
+                    continue;
+                }
+                newpush.push(i);
+            }
+            mainDidEvent = newpush;
         }
     }
 }
@@ -127,6 +140,13 @@ const createAppNavigator = (mainProps) => {
             }
             let idx = item.navigation.state.index;
             let route = item.navigation.state.routes[idx];
+
+            if (route.routeName == DEFAULT_INITIALROUTENAME) {
+                // 执行事件
+                for (let d of mainDidEvent) {
+                    d && d();
+                }
+            }
 
         }
     });
