@@ -36,14 +36,14 @@ const applyRouteNavigation = (props) => {
         let navigate, naviName;
         naviName = "navigation";
         navigate = props.navigation.navigate;
-        props[naviName].navigate = (routeName,params,animateConfig) => {
-            let appNaviKey =  props.navigation.state.routeName;
+        props[naviName].navigate = (routeName, params, animateConfig) => {
+            let appNaviKey = props.navigation.state.routeName;
             let isCardAnimated = kit.getValueSystem(appNaviKey);
             if (!isCardAnimated) {
                 if (animateConfig) {
-                    kit.setValueSystem("initalScreenInterpolator",animateConfig);
+                    kit.setValueSystem("initalScreenInterpolator", animateConfig);
                 }
-                navigate(routeName,params);
+                navigate(routeName, params);
                 kit.setValueSystem(appNaviKey, true);
             }
         }
@@ -54,7 +54,7 @@ const createAppNavigator = (mainProps) => {
 
     // 注册主界面控制器
     StackNavigatorConfig[DEFAULT_INITIALROUTENAME] = {
-        screen: (props)=>{
+        screen: (props) => {
             applyRouteNavigation(props);
             return <TabMain
                 {...props}
@@ -66,17 +66,17 @@ const createAppNavigator = (mainProps) => {
 
     for (let item of StackNavigatorMenus) {
         let Screen = item.screen;
-        if (item.isDefault){
-            kit.setValueSystem("initialRouteName",item.routeNameKey,true);
+        if (item.isDefault) {
+            kit.setValueSystem("initialRouteName", item.routeNameKey, true);
         }
         StackNavigatorConfig[item.routeNameKey] = {
-            screen : (props)=>{
+            screen: (props) => {
                 applyRouteNavigation(props);
                 return <Screen
                     {...props}
                 />
             },
-            navigationOptions : item.navigationOptions
+            navigationOptions: item.navigationOptions
         }
     }
 
@@ -86,30 +86,32 @@ const createAppNavigator = (mainProps) => {
         transitionConfig: () => {
             // 改变个性化动画
             // 默认水平横进来
-            let  initalScreenInterpolator= kit.getValueSystem("initalScreenInterpolator");
+            let initalScreenInterpolator = kit.getValueSystem("initalScreenInterpolator");
             let screenInterConfig = initalScreenInterpolator || {
-                animateStyle:"horizontal",
+                animateStyle: "horizontal",
                 // animateStyle:"horizontal",
-                isAnimated:true
+                isAnimated: true
             };
             let cardStyle = CardStackStyleInterpolator.forHorizontal;
-            if(screenInterConfig.animateStyle == "vertical") {
+            if (screenInterConfig.animateStyle == "vertical") {
                 cardStyle = CardStackStyleInterpolator.forVertical;
             } else {
                 cardStyle = CardStackStyleInterpolator.forHorizontal;
             }
 
-            let transitionSpec = {
-                    duration: 250,
-                    easing: Easing.linear,
-                    timing: Animated.timing,
-            };
-            if (!screenInterConfig.isAnimated){
-                transitionSpec.duration = 0;
-            }
-            return {
-                screenInterpolator:cardStyle,
-                transitionSpec: transitionSpec,
+            if (!screenInterConfig.isAnimated) {
+                return {
+                    screenInterpolator: cardStyle,
+                    transitionSpec: {
+                        duration: 0,
+                        easing: Easing.linear,
+                        timing: Animated.timing,
+                    }
+                }
+            } else {
+                return {
+                    screenInterpolator: cardStyle,
+                }
             }
         },
         onTransitionStart: (item, pre) => {
@@ -121,7 +123,7 @@ const createAppNavigator = (mainProps) => {
         onTransitionEnd: (item, pre) => {
             let initalScreenInterpolator = kit.getValueSystem("initalScreenInterpolator");
             if (initalScreenInterpolator) {
-                kit.setValueSystem("initalScreenInterpolator",null);
+                kit.setValueSystem("initalScreenInterpolator", null);
             }
             let idx = item.navigation.state.index;
             let route = item.navigation.state.routes[idx];
