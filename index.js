@@ -47,19 +47,19 @@ const applyRouteNavigation = (props) => {
                 kit.setValueSystem(appNaviKey, true);
             }
         }
-        props.registerDidLoadEvent = (d)=>{
-            mainDidEvent.push(d);
-        }
-        props.unregisterDidLoadEvent = (d)=>{
-            let newpush = [];
-            for(let i of mainDidEvent){
-                if (i == d){
-                    continue;
-                }
-                newpush.push(i);
+    }
+    props.registerDidLoadEvent = (d)=>{
+        mainDidEvent.push(d);
+    }
+    props.unregisterDidLoadEvent = (d)=>{
+        let newpush = [];
+        for(let i of mainDidEvent){
+            if (i == d){
+                continue;
             }
-            mainDidEvent = newpush;
+            newpush.push(i);
         }
+        mainDidEvent = newpush;
     }
 }
 
